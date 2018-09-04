@@ -9,13 +9,19 @@ var giphy = require('giphy-api')();
 
 app.use(express.static('public'));
 
-app.engine('handlebars', exphbs({defaultLayout: 'main'}));
+app.engine('handlebars', exphbs({ defaultLayout: 'main' }));
 app.set('view engine', 'handlebars');
 
 app.get('/', function (req, res) {
-  giphy.search(req.query.term, function (err, response) {
-    res.render('home', {gifs: response.data})
-  });
+  if (req.query.term) {
+    giphy.search(req.query.term, function (err, response) {
+      res.render('home', { gifs: response.data })
+    });
+  } else {
+    giphy.trending(function (err, response) {
+      res.render('home', { gifs: response.data })
+    })
+  }
 });
 
 app.get('/hello-gif', function (req, res) {
@@ -25,7 +31,7 @@ app.get('/hello-gif', function (req, res) {
 
 app.get('/greetings/:name', function (req, res) {
   var name = req.params.name;
-  res.render('greetings', {name: name});
+  res.render('greetings', { name: name });
 });
 
 app.listen(3000, function () {
